@@ -1,14 +1,25 @@
 import pandas as pd
 
-def audit_and_clean_data(dataframe):
-    print("\n[SECURITY SCAN] Running UEBA filters on student metrics...")
+def audit_and_clean_data(df)
+    print("[AUDIT] Starting securing data integrity checks.....")
     
-   
-    clean_dataframe = dataframe.fillna(dataframe.mean(numeric_only=True))
+    corrupted_data = df[
+        (df['study_hours_per_day']>24) |
+        (df['exam_score']<0)|
+        (df['attendance_percentage']>100)
+    ]
+
+    clean_data = df[
+        (df['study_hours_per_day']<=24) &
+        (df['exam_score']>=0) &
+        (df['attendance_percentage']<=100)
+    ]
+
+    if not corrupted_data.empty:
+        print(f"[ALERT] Security anomaly detected! Found {len(corrupted_data)} corrupted records.")
+        corrupted_data.to_csv("corrupted_audit_log.csv", index = False)
+        print("[LOG] Corrupted files successfully logged to 'corrupted_audit_log.csv'" )
+    else:
+        print("[SUCCESS] All clear! No data integrity issue found.")
     
-    valid_data_condition = (clean_dataframe['Study_Hours'] <= 24) & (clean_dataframe['Sleep_Hours'] >= 0)
-    
-    
-    clean_dataframe = clean_dataframe[valid_data_condition]
-    return clean_dataframe
-    
+    return clean_data
